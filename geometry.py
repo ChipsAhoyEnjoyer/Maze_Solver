@@ -26,7 +26,7 @@ class Line:
 )       
 
 class Cell:
-    def __init__(self, x1, x2, y1, y2, window) -> None:
+    def __init__(self, x1:int, x2:int, y1:int, y2:int, window) -> None:
         self.has_left_wall = True
         self.has_right_wall = True
         self.has_top_wall = True
@@ -60,7 +60,7 @@ class Cell:
                      Point(self._x2, self._y2)), 
                      DEFAULT_LINE_COLOR)
 
-    def draw_move(self, to_cell, undo = False):
+    def draw_move(self, to_cell, undo = False) -> None:
         line_color = GRAY
         if undo:
             line_color = RED

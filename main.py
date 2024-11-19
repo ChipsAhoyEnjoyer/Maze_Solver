@@ -1,5 +1,5 @@
 from ui import Window
-from geometry import Line, Point, Cell
+from maze import Maze
 
 
 SCREEN_WIDTH = 800
@@ -8,15 +8,18 @@ SCREEN_HEIGHT = 600
 
 
 
-def main():
+def main() -> None:
     win = Window(SCREEN_WIDTH, SCREEN_HEIGHT)
 
-    cell = Cell(300, 350, 300, 350, win)
-    cell2 = Cell(350, 400, 300, 350, win)
+    num_rows = 12
+    num_cols = 16
+    margin = 50
+    screen_x = 800
+    screen_y = 600
+    cell_size_x = (screen_x - 2 * margin) // num_cols
+    cell_size_y = (screen_y - 2 * margin) // num_rows
 
-    cell.draw_move(cell2, undo=True)
-    cell.draw()
-    cell2.draw()
+    maze = Maze(margin, margin, num_rows, num_cols, cell_size_x, cell_size_y, win)
 
     win.wait_for_close()
 

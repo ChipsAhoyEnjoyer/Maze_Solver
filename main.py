@@ -1,19 +1,21 @@
 from ui import Window
-from line import Line, Point
+from geometry import Line, Point, Cell
 
 
-line_color = "black"
-line = Line(Point(0,0), Point(50, 50))
-line2 = Line(Point(48, 72), Point(50, 50))
-line3 = Line(Point(0,0), Point(48,72))
+LINE_COLOR = "black"
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
+
+
+coords = [(x, y) for x in range(0, 801, 20) for y in range(0, 801, 20)]
 
 
 def main():
-    win = Window(800, 600)
+    win = Window(SCREEN_WIDTH, SCREEN_HEIGHT)
 
-    win.draw_line(line, line_color)
-    win.draw_line(line2, line_color)
-    win.draw_line(line3, line_color)
+    for coord in coords:
+        cell = Cell(window=win, x1=coord[0], y1=coord[0],x2=coord[1],y2=coord[1])
+        cell.draw(LINE_COLOR)
 
     win.wait_for_close()
 

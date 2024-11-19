@@ -8,11 +8,9 @@ class Point:
 
 
 class Line:
-    def __init__(self, point_a:tuple, point_b:tuple) -> None:
-        if len(point_a) != 2 or len(point_b) != 2:
-            raise Exception("Points should be a tuple that contains 2 integers")
-        self.__point_a = Point(point_a[0], point_a[1])
-        self.__point_b = Point(point_b[0], point_b[1])
+    def __init__(self, point_a:Point, point_b:Point) -> None:
+        self.__point_a = Point(point_a.x, point_a.y)
+        self.__point_b = Point(point_b.x, point_b.y)
 
     def draw(self, canvas, fill_color:str) -> None:
         line = canvas.create_line(
@@ -23,3 +21,6 @@ class Line:
             fill=fill_color, 
             width=line_width, 
 )       
+
+class Cell:
+    pass

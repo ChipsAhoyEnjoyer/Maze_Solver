@@ -21,6 +21,7 @@ def main() -> None:
 
     maze = Maze(margin, margin, num_rows, num_cols, cell_size_x, cell_size_y, win)
 
+
     win.wait_for_close()
 
 if __name__ == "__main__":

@@ -32,6 +32,7 @@ class Cell:
         self.has_right_wall = True
         self.has_top_wall = True
         self.has_bottom_wall = True
+        self.visited = False
 
         self._x1 = x1
         self._y1 = y1

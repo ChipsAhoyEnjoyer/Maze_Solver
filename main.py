@@ -11,8 +11,8 @@ SCREEN_HEIGHT = 600
 def main() -> None:
     win = Window(SCREEN_WIDTH, SCREEN_HEIGHT)
 
-    num_rows = 16
-    num_cols = 12
+    num_rows = 20
+    num_cols = 20
     margin = 50
     screen_x = 800
     screen_y = 600

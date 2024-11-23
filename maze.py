@@ -77,20 +77,30 @@ class Maze:
                         (i, j + 1), 
                         (i, j - 1)]
             possible_moves = []
-            # TODO Make this more readable ------_____-------
             for col, row in directions:
-                print(col, row)
                 if 0 <= col < len(self._cells):
                     if 0 <= row < len(self._cells[col]):
                         if not self._cells[col][row].visited:
                             possible_moves.append((col, row))
-            print(possible_moves)
             if len(possible_moves) == 0:
                 current.draw()
                 return
-            # TODO Figure out how to break down the walls between the random cell and this one
             next_cell = random.choice(possible_moves)
-            current.draw_move(self._cells[next_cell[0]][next_cell[1]])
+            if next_cell == (i + 1, j):
+                current.has_right_wall = False
+                self._cells[next_cell[0]][next_cell[1]].has_left_wall = False
+            elif next_cell == (i - 1, j):
+                current.has_left_wall = False
+                self._cells[next_cell[0]][next_cell[1]].has_right_wall = False
+            elif next_cell == (i, j + 1):
+                current.has_bottom_wall = False
+                self._cells[next_cell[0]][next_cell[1]].has_top_wall = False
+            else:
+                current.has_top_wall = False
+                self._cells[next_cell[0]][next_cell[1]].has_bottom_wall = False
+
+            self._draw_cell(i, j)
+            self._draw_cell(*next_cell)
             self._break_walls_r(*next_cell)
 
 

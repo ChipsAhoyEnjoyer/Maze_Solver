@@ -3,6 +3,8 @@ import random
 from geometry import Cell
 from time import sleep
 
+REFRESH_RATE = 0.05
+
 
 class Maze:
     def __init__(self, 
@@ -56,8 +58,10 @@ class Maze:
                 self._draw_cell(column, row)
 
     def _animate(self) -> None:
+        if self._win is None:
+            return
         self._win.redraw()
-        sleep(0.05)
+        sleep(REFRESH_RATE)
 
     def _break_entrance_and_exit(self) -> None:
         entrance = self._cells[0][0]
@@ -74,18 +78,21 @@ class Maze:
         current.visited = True
         while True:
             directions = [(i + 1, j), 
-                        (i - 1, j), 
-                        (i, j + 1), 
-                        (i, j - 1)]
+                          (i - 1, j), 
+                          (i, j + 1), 
+                          (i, j - 1)]
             possible_moves = []
+
             for col, row in directions:
                 if 0 <= col < len(self._cells):
                     if 0 <= row < len(self._cells[col]):
                         if not self._cells[col][row].visited:
                             possible_moves.append((col, row))
+                
             if len(possible_moves) == 0:
                 self._draw_cell(i, j)
                 return
+            
             next_cell = random.choice(possible_moves)
             if next_cell == (i + 1, j):
                 current.has_right_wall = False
@@ -107,6 +114,65 @@ class Maze:
         for col in self._cells:
             for cell in col:
                 cell.visited = False
+    
+    def solve(self) -> bool:
+        return self.solve_r()
+
+    def solve_r(self, i:int=0, j:int=0) -> bool:
+        self._animate()
+        current = self._cells[i][j]
+        current.visited = True
+        if current == self._cells[-1][-1]:
+            return True
+        
+        directions = [(i + 1, j), 
+                      (i - 1, j), 
+                      (i, j + 1), 
+                      (i, j - 1)]
+        
+        for col, row in directions:
+            if 0 <= col < len(self._cells):
+                if 0 <= row < len(self._cells[col]):
+                    if (
+                        ((col, row) == (i + 1, j)) and
+                        (not current.has_right_wall) and 
+                        (not self._cells[col][row].visited)
+                        ):
+                            current.draw_move(self._cells[col][row])
+                            if self.solve_r(col, row):
+                                return True
+                            current.draw_move(self._cells[col][row], undo=True)
+                    if (
+                        ((col, row) == (i - 1, j)) and
+                        (not current.has_left_wall) and 
+                        (not self._cells[col][row].visited)
+                        ):
+                            current.draw_move(self._cells[col][row])
+                            if self.solve_r(col, row):
+                                return True
+                            current.draw_move(self._cells[col][row], undo=True)
+                    if (
+                        ((col, row) == (i, j + 1)) and
+                        (not current.has_bottom_wall) and 
+                        (not self._cells[col][row].visited)
+                        ):
+                            current.draw_move(self._cells[col][row])
+                            if self.solve_r(col, row):
+                                return True
+                            current.draw_move(self._cells[col][row], undo=True)
+                    if (
+                        ((col, row) == (i, j - 1)) and
+                        (not current.has_top_wall) and 
+                        (not self._cells[col][row].visited)
+                        ):
+                            current.draw_move(self._cells[col][row])
+                            if self.solve_r(col, row):
+                                return True
+                            current.draw_move(self._cells[col][row], undo=True)
+        return False
+
+        
+
 
 
 

@@ -1,11 +1,8 @@
 from ui import Window
 from maze import Maze
 
-
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
-
-
 
 
 def main() -> None:
@@ -28,9 +25,8 @@ def main() -> None:
     else:
         print("Maze can not be solved...")
 
-
     win.wait_for_close()
+
 
 if __name__ == "__main__":
     main()
-

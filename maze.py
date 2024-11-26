@@ -68,8 +68,8 @@ class Maze:
         entrance.has_top_wall = False
         if self._win is not None:
             self._draw_cell(0, 0)
-        salida = self._cells[-1][-1]
-        salida.has_bottom_wall = False
+        exit_cell = self._cells[-1][-1]
+        exit_cell.has_bottom_wall = False
         if self._win is not None:
             self._draw_cell(-1, -1)
 
@@ -170,3 +170,61 @@ class Maze:
                             return True
                         current.draw_move(self._cells[col][row], undo=True)
         return False
+
+    def solve_l(self, i: int = 0, j: int = 0) -> bool:
+        self._cells[i][j].visited = True
+        to_visit = [(i, j)]
+
+        while to_visit:
+            current = to_visit.pop(0)
+            directions = [(current[0] + 1, current[1]),
+                          (current[0] - 1, current[1]),
+                          (current[0], current[1] + 1),
+                          (current[0], current[1] - 1)]
+
+            for col, row in directions:
+                if 0 <= col < len(self._cells):
+                    if 0 <= row < len(self._cells[col]):
+
+                        if self._cells[col][row] == self._cells[-1][-1]: # Found exit
+                            self._cells[current[0]][current[1]].draw_move(self._cells[col][row])
+                            self._animate()
+                            return True
+
+                        if not self._cells[col][row].visited and (col, row) not in to_visit:
+                            print(f"Current: ({current[0]}, {current[1]})")
+                            print(f"Current info:")
+                            print(f"Top = {self._cells[current[0]][current[1]].has_top_wall}")
+                            print(f"Bottom = {self._cells[current[0]][current[1]].has_bottom_wall}")
+                            print(f"Left = {self._cells[current[0]][current[1]].has_left_wall}")
+                            print(f"Right = {self._cells[current[0]][current[1]].has_right_wall}")
+                            print(f"Visiting: ({col}, {row})")
+                            print(f"")
+
+                            if (col, row) == (i + 1, j) and not self._cells[current[0]][current[1]].has_right_wall:
+                                self._cells[current[0]][current[1]].draw_move(self._cells[col][row])
+                                self._animate()
+                                to_visit.append((col, row))
+
+                            elif (col, row) == (i - 1, j) and not self._cells[current[0]][current[1]].has_left_wall:
+                                self._cells[current[0]][current[1]].draw_move(self._cells[col][row])
+                                self._animate()
+                                to_visit.append((col, row))
+
+                            elif (col, row) == (i, j + 1) and not self._cells[current[0]][current[1]].has_bottom_wall:
+                                self._cells[current[0]][current[1]].draw_move(self._cells[col][row])
+                                self._animate()
+                                to_visit.append((col, row))
+
+                            elif (col, row) == (i, j - 1) and not self._cells[current[0]][current[1]].has_top_wall:
+                                self._cells[current[0]][current[1]].draw_move(self._cells[col][row])
+                                self._animate()
+                                to_visit.append((col, row))
+                        print(to_visit)
+        return False # All paths exhausted
+
+
+
+
+
+

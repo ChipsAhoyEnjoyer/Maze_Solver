@@ -8,8 +8,8 @@ SCREEN_HEIGHT = 600
 def main() -> None:
     win = Window(SCREEN_WIDTH, SCREEN_HEIGHT)
 
-    num_rows = 5
-    num_cols = 5
+    num_rows = 12
+    num_cols = 16
     margin = 50
     screen_x = SCREEN_WIDTH
     screen_y = SCREEN_HEIGHT
@@ -18,7 +18,7 @@ def main() -> None:
     print("Creating maze.")
     maze = Maze(margin, margin, num_rows, num_cols, cell_size_x, cell_size_y, win, 0)
     print("Solving!")
-    solve = maze.solve_l()
+    solve = maze.solve(method="r")
     print("Done...")
     if solve:
         print("Maze solved!")

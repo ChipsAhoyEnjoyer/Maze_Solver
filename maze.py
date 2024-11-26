@@ -115,8 +115,11 @@ class Maze:
             for cell in col:
                 cell.visited = False
 
-    def solve(self) -> bool:
-        return self.solve_r()
+    def solve(self, method: str = "r") -> bool:
+        if method == "r":
+            return self.solve_r()
+        if method == "l":
+            return self.solve_l()
 
     def solve_r(self, i: int = 0, j: int = 0) -> bool:
         self._animate()
@@ -181,50 +184,39 @@ class Maze:
                           (current[0] - 1, current[1]),
                           (current[0], current[1] + 1),
                           (current[0], current[1] - 1)]
-
             for col, row in directions:
                 if 0 <= col < len(self._cells):
                     if 0 <= row < len(self._cells[col]):
 
-                        if self._cells[col][row] == self._cells[-1][-1]: # Found exit
+                        if self._cells[col][row] == self._cells[-1][-1]:  # Found exit
                             self._cells[current[0]][current[1]].draw_move(self._cells[col][row])
                             self._animate()
                             return True
 
                         if not self._cells[col][row].visited and (col, row) not in to_visit:
-                            print(f"Current: ({current[0]}, {current[1]})")
-                            print(f"Current info:")
-                            print(f"Top = {self._cells[current[0]][current[1]].has_top_wall}")
-                            print(f"Bottom = {self._cells[current[0]][current[1]].has_bottom_wall}")
-                            print(f"Left = {self._cells[current[0]][current[1]].has_left_wall}")
-                            print(f"Right = {self._cells[current[0]][current[1]].has_right_wall}")
-                            print(f"Visiting: ({col}, {row})")
-                            print(f"")
 
-                            if (col, row) == (i + 1, j) and not self._cells[current[0]][current[1]].has_right_wall:
+                            if (col, row) == (current[0] + 1, current[1]) and not self._cells[current[0]][
+                                current[1]].has_right_wall:
                                 self._cells[current[0]][current[1]].draw_move(self._cells[col][row])
                                 self._animate()
                                 to_visit.append((col, row))
 
-                            elif (col, row) == (i - 1, j) and not self._cells[current[0]][current[1]].has_left_wall:
+                            elif (col, row) == (current[0] - 1, current[1]) and not self._cells[current[0]][
+                                current[1]].has_left_wall:
                                 self._cells[current[0]][current[1]].draw_move(self._cells[col][row])
                                 self._animate()
                                 to_visit.append((col, row))
 
-                            elif (col, row) == (i, j + 1) and not self._cells[current[0]][current[1]].has_bottom_wall:
+                            elif (col, row) == (current[0], current[1] + 1) and not self._cells[current[0]][
+                                current[1]].has_bottom_wall:
                                 self._cells[current[0]][current[1]].draw_move(self._cells[col][row])
                                 self._animate()
                                 to_visit.append((col, row))
 
-                            elif (col, row) == (i, j - 1) and not self._cells[current[0]][current[1]].has_top_wall:
+                            elif (col, row) == (current[0], current[1] - 1) and not self._cells[current[0]][
+                                current[1]].has_top_wall:
                                 self._cells[current[0]][current[1]].draw_move(self._cells[col][row])
                                 self._animate()
                                 to_visit.append((col, row))
-                        print(to_visit)
-        return False # All paths exhausted
 
-
-
-
-
-
+        return False  # All paths exhausted

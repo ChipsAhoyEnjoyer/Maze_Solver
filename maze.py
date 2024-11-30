@@ -1,9 +1,9 @@
 import random
-
+import collections
 from geometry import Cell
 from time import sleep
 
-REFRESH_RATE = 0.05
+REFRESH_RATE = 0.01
 
 
 class Maze:
@@ -18,8 +18,9 @@ class Maze:
                  seed: int = None) -> None:
         self.x1 = x1
         self.y1 = y1
-        self.num_rows = num_rows
         self.num_cols = num_cols
+        self.num_rows = num_rows
+        self.goal_coords = (num_cols - 1, num_rows - 1)
         if self.num_rows < 1 or self.num_cols < 1:
             raise Exception("Number of rows/columns cannot be zero(0) or negative.")
         self._cell_size_x = cell_size_x
@@ -57,11 +58,11 @@ class Maze:
             for row in range(self.num_rows):
                 self._draw_cell(column, row)
 
-    def _animate(self) -> None:
+    def _animate(self, refresh_rate: float = REFRESH_RATE) -> None:
         if self._win is None:
             return
         self._win.redraw()
-        sleep(REFRESH_RATE)
+        sleep(refresh_rate)
 
     def _break_entrance_and_exit(self) -> None:
         entrance = self._cells[0][0]
@@ -116,16 +117,21 @@ class Maze:
                 cell.visited = False
 
     def solve(self, method: str = "r") -> bool:
-        if method == "r":
-            return self.solve_r()
-        if method == "l":
-            return self.solve_l()
+        if method == "DFS":
+            return self._solve_r()
+        if method == "BFS":
+            return self._solve_l()
 
-    def solve_r(self, i: int = 0, j: int = 0) -> bool:
+    def _is_goal(self, col: int, row: int) -> bool:
+        if (col, row) == self.goal_coords:
+            return True
+        return False
+
+    def _solve_r(self, i: int = 0, j: int = 0) -> bool:
         self._animate()
         current = self._cells[i][j]
         current.visited = True
-        if current == self._cells[-1][-1]:
+        if (i, j) == self.goal_coords:
             return True
 
         directions = [(i + 1, j),
@@ -142,7 +148,7 @@ class Maze:
                             (not self._cells[col][row].visited)
                     ):
                         current.draw_move(self._cells[col][row])
-                        if self.solve_r(col, row):
+                        if self._solve_r(col, row):
                             return True
                         current.draw_move(self._cells[col][row], undo=True)
                     if (
@@ -151,7 +157,7 @@ class Maze:
                             (not self._cells[col][row].visited)
                     ):
                         current.draw_move(self._cells[col][row])
-                        if self.solve_r(col, row):
+                        if self._solve_r(col, row):
                             return True
                         current.draw_move(self._cells[col][row], undo=True)
                     if (
@@ -160,7 +166,7 @@ class Maze:
                             (not self._cells[col][row].visited)
                     ):
                         current.draw_move(self._cells[col][row])
-                        if self.solve_r(col, row):
+                        if self._solve_r(col, row):
                             return True
                         current.draw_move(self._cells[col][row], undo=True)
                     if (
@@ -169,54 +175,58 @@ class Maze:
                             (not self._cells[col][row].visited)
                     ):
                         current.draw_move(self._cells[col][row])
-                        if self.solve_r(col, row):
+                        if self._solve_r(col, row):
                             return True
                         current.draw_move(self._cells[col][row], undo=True)
         return False
 
-    def solve_l(self, i: int = 0, j: int = 0) -> bool:
+    def _solve_l(self, i: int = 0, j: int = 0) -> bool:
         self._cells[i][j].visited = True
-        to_visit = [(i, j)]
+        to_visit = collections.deque([(i, j),])
 
         while to_visit:
-            current = to_visit.pop(0)
+            current = to_visit.popleft()
+            self._cells[current[0]][current[1]].visited = True
             directions = [(current[0] + 1, current[1]),
                           (current[0] - 1, current[1]),
                           (current[0], current[1] + 1),
                           (current[0], current[1] - 1)]
+
             for col, row in directions:
-                if 0 <= col < len(self._cells):
-                    if 0 <= row < len(self._cells[col]):
-
-                        if self._cells[col][row] == self._cells[-1][-1]:  # Found exit
-                            self._cells[current[0]][current[1]].draw_move(self._cells[col][row])
-                            self._animate()
-                            return True
-
+                if 0 <= col < len(self._cells):  # Within the maze columns
+                    if 0 <= row < len(self._cells[col]):  # Within the maze rows
                         if not self._cells[col][row].visited and (col, row) not in to_visit:
+                            if col == current[0] + 1:
+                                if not self._cells[current[0]][current[1]].has_right_wall:
+                                    self._cells[current[0]][current[1]].draw_move(self._cells[col][row])
+                                    if self._is_goal(col, row):
+                                        self._animate()
+                                        return True
+                                    to_visit.append((col, row))
 
-                            if (col, row) == (current[0] + 1, current[1]) and not self._cells[current[0]][
-                                current[1]].has_right_wall:
-                                self._cells[current[0]][current[1]].draw_move(self._cells[col][row])
-                                self._animate()
-                                to_visit.append((col, row))
+                            elif col == current[0] - 1:
+                                if not self._cells[current[0]][current[1]].has_left_wall:
+                                    self._cells[current[0]][current[1]].draw_move(self._cells[col][row])
+                                    if self._is_goal(col, row):
+                                        self._animate()
+                                        return True
+                                    to_visit.append((col, row))
 
-                            elif (col, row) == (current[0] - 1, current[1]) and not self._cells[current[0]][
-                                current[1]].has_left_wall:
-                                self._cells[current[0]][current[1]].draw_move(self._cells[col][row])
-                                self._animate()
-                                to_visit.append((col, row))
+                            elif row == current[1] + 1:
+                                if not self._cells[current[0]][current[1]].has_bottom_wall:
+                                    self._cells[current[0]][current[1]].draw_move(self._cells[col][row])
+                                    if self._is_goal(col, row):
+                                        self._animate()
+                                        return True
+                                    to_visit.append((col, row))
 
-                            elif (col, row) == (current[0], current[1] + 1) and not self._cells[current[0]][
-                                current[1]].has_bottom_wall:
-                                self._cells[current[0]][current[1]].draw_move(self._cells[col][row])
-                                self._animate()
-                                to_visit.append((col, row))
-
-                            elif (col, row) == (current[0], current[1] - 1) and not self._cells[current[0]][
-                                current[1]].has_top_wall:
-                                self._cells[current[0]][current[1]].draw_move(self._cells[col][row])
-                                self._animate()
-                                to_visit.append((col, row))
+                            elif row == current[1] - 1:
+                                if not self._cells[current[0]][current[1]].has_top_wall:
+                                    self._cells[current[0]][current[1]].draw_move(self._cells[col][row])
+                                    if self._is_goal(col, row):
+                                        self._animate()
+                                        return True
+                                    to_visit.append((col, row))
+                            self._animate(0.03)
 
         return False  # All paths exhausted

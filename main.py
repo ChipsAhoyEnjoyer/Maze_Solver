@@ -3,13 +3,14 @@ from maze import Maze
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
+SOLVE_METHOD = "BFS"
 
 
 def main() -> None:
     win = Window(SCREEN_WIDTH, SCREEN_HEIGHT)
 
-    num_rows = 12
-    num_cols = 16
+    num_rows = 10
+    num_cols = 10
     margin = 50
     screen_x = SCREEN_WIDTH
     screen_y = SCREEN_HEIGHT
@@ -18,7 +19,7 @@ def main() -> None:
     print("Creating maze.")
     maze = Maze(margin, margin, num_rows, num_cols, cell_size_x, cell_size_y, win, 0)
     print("Solving!")
-    solve = maze.solve(method="r")
+    solve = maze.solve(method=SOLVE_METHOD)
     print("Done...")
     if solve:
         print("Maze solved!")
